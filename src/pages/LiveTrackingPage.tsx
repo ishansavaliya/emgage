@@ -8,6 +8,7 @@ import { useLocationData } from "../hooks/useLocationData";
 import useAutoRefresh from "../hooks/useAutoRefresh";
 import { Employee } from "../types/employee";
 import { Typography, Container, Grid, Paper, Box } from "@mui/material";
+import HistoryPopup from "../components/History/HistoryPopup";
 
 const LiveTrackingPage: React.FC = () => {
   const { employees, loading, error, refreshData } = useLocationData();
@@ -16,6 +17,13 @@ const LiveTrackingPage: React.FC = () => {
       refreshData,
       30000 // Auto-refresh every 30 seconds
     );
+  const [selectedEmployee, setSelectedEmployee] =
+    React.useState<Employee | null>(null);
+  const [showHistoryPopup, setShowHistoryPopup] =
+    React.useState<boolean>(false);
+  const [focusEmployeeId, setFocusEmployeeId] = React.useState<
+    string | undefined
+  >(undefined);
 
   const handleToggleAutoRefresh = () => {
     if (isActive) {
@@ -23,6 +31,15 @@ const LiveTrackingPage: React.FC = () => {
     } else {
       startAutoRefresh();
     }
+  };
+
+  const handleViewHistory = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setShowHistoryPopup(true);
+  };
+
+  const handleEmployeeSelect = (employee: Employee) => {
+    setFocusEmployeeId(employee.id);
   };
 
   if (loading) {
@@ -69,7 +86,12 @@ const LiveTrackingPage: React.FC = () => {
               </Typography>
               <div className="space-y-4">
                 {employees.map((employee: Employee) => (
-                  <EmployeeCard key={employee.id} employee={employee} />
+                  <EmployeeCard
+                    key={employee.id}
+                    employee={employee}
+                    onViewHistory={handleViewHistory}
+                    onSelect={handleEmployeeSelect}
+                  />
                 ))}
               </div>
             </Paper>
@@ -78,10 +100,19 @@ const LiveTrackingPage: React.FC = () => {
           {/* Map */}
           <Grid item xs={12} lg={8}>
             <Paper elevation={2} className="h-96 lg:h-[600px]">
-              <TrackingMap />
+              <TrackingMap focusEmployeeId={focusEmployeeId} />
             </Paper>
           </Grid>
         </Grid>
+
+        {/* History popup at the page level */}
+        {selectedEmployee && (
+          <HistoryPopup
+            open={showHistoryPopup}
+            onClose={() => setShowHistoryPopup(false)}
+            employee={selectedEmployee}
+          />
+        )}
       </Container>
     </Layout>
   );

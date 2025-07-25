@@ -14,14 +14,47 @@ import { format } from "date-fns";
 
 interface EmployeeCardProps {
   employee: Employee;
+  onViewHistory?: (employee: Employee) => void;
+  onSelect?: (employee: Employee) => void;
 }
 
-const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee }) => {
+const EmployeeCard: React.FC<EmployeeCardProps> = ({
+  employee,
+  onViewHistory,
+  onSelect,
+}) => {
   const [showHistory, setShowHistory] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleHistoryClick = (e: React.MouseEvent) => {
+    // Prevent the card click from triggering
+    e.stopPropagation();
+
+    if (onViewHistory) {
+      onViewHistory(employee);
+    } else {
+      setShowHistory(true);
+    }
+  };
+
+  const handleCardClick = () => {
+    if (onSelect) {
+      onSelect(employee);
+      // Visual feedback for user that this employee is now focused
+      setIsFocused(true);
+      // Reset the focus after a short delay for visual feedback
+      setTimeout(() => setIsFocused(false), 1000);
+    }
+  };
 
   return (
     <>
-      <Card className="hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+      <Card
+        className={`hover:shadow-lg transition-all duration-300 cursor-pointer ${
+          isFocused ? "ring-2 ring-blue-500 shadow-lg bg-blue-50" : ""
+        }`}
+        onClick={handleCardClick}
+      >
         <CardContent className="p-4">
           <div className="flex items-center space-x-4">
             <Avatar
@@ -58,7 +91,7 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee }) => {
                   )}
                 </div>
                 <IconButton
-                  onClick={() => setShowHistory(true)}
+                  onClick={(e) => handleHistoryClick(e)}
                   size="small"
                   className="text-blue-600"
                 >
@@ -70,11 +103,13 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee }) => {
         </CardContent>
       </Card>
 
-      <HistoryPopup
-        open={showHistory}
-        onClose={() => setShowHistory(false)}
-        employee={employee}
-      />
+      {!onViewHistory && (
+        <HistoryPopup
+          open={showHistory}
+          onClose={() => setShowHistory(false)}
+          employee={employee}
+        />
+      )}
     </>
   );
 };
