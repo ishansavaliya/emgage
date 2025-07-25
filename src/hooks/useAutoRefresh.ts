@@ -63,11 +63,11 @@ const useAutoRefresh = (fetchData: () => Promise<void>, interval: number) => {
 
   // Auto-start on mount
   useEffect(() => {
-    startAutoRefresh();
-    return () => {
-      stopAutoRefresh();
-    };
-  }, []);
+    if (isActive) {
+      // Fetch initial data
+      fetchData();
+    }
+  }, []); // Only run on mount
 
   return { startAutoRefresh, stopAutoRefresh, isActive, timeLeft };
 };

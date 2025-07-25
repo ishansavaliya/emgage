@@ -127,6 +127,130 @@ const HistoryPopup: React.FC<HistoryPopupProps> = ({
                 </ListItem>
               ))}
             </List>
+
+            {/* Travel Path Preview */}
+            <Box className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <Typography variant="h6" className="mb-3 text-gray-800">
+                Travel Path Overview
+              </Typography>
+              <div className="relative h-32 bg-white rounded border">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 400 120"
+                  className="absolute inset-0"
+                >
+                  {(() => {
+                    if (employee.history.length < 2) return null;
+
+                    const lats = employee.history.map(
+                      (h) => h.location.latitude
+                    );
+                    const lngs = employee.history.map(
+                      (h) => h.location.longitude
+                    );
+                    const minLat = Math.min(...lats);
+                    const maxLat = Math.max(...lats);
+                    const minLng = Math.min(...lngs);
+                    const maxLng = Math.max(...lngs);
+                    const latRange = maxLat - minLat || 0.01;
+                    const lngRange = maxLng - minLng || 0.01;
+
+                    return (
+                      <>
+                        {/* Draw complete path */}
+                        {employee.history.map((record, index) => {
+                          if (index === 0) return null;
+                          const prevRecord = employee.history[index - 1];
+                          const x1 =
+                            ((prevRecord.location.longitude - minLng) /
+                              lngRange) *
+                              360 +
+                            20;
+                          const y1 =
+                            ((maxLat - prevRecord.location.latitude) /
+                              latRange) *
+                              80 +
+                            20;
+                          const x2 =
+                            ((record.location.longitude - minLng) / lngRange) *
+                              360 +
+                            20;
+                          const y2 =
+                            ((maxLat - record.location.latitude) / latRange) *
+                              80 +
+                            20;
+
+                          return (
+                            <line
+                              key={`path-${index}`}
+                              x1={x1}
+                              y1={y1}
+                              x2={x2}
+                              y2={y2}
+                              stroke="#ef4444"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          );
+                        })}
+
+                        {/* Start and end points */}
+                        {(() => {
+                          const firstPoint = employee.history[0];
+                          const lastPoint =
+                            employee.history[employee.history.length - 1];
+                          const startX =
+                            ((firstPoint.location.longitude - minLng) /
+                              lngRange) *
+                              360 +
+                            20;
+                          const startY =
+                            ((maxLat - firstPoint.location.latitude) /
+                              latRange) *
+                              80 +
+                            20;
+                          const endX =
+                            ((lastPoint.location.longitude - minLng) /
+                              lngRange) *
+                              360 +
+                            20;
+                          const endY =
+                            ((maxLat - lastPoint.location.latitude) /
+                              latRange) *
+                              80 +
+                            20;
+
+                          return (
+                            <>
+                              <circle
+                                cx={startX}
+                                cy={startY}
+                                r="6"
+                                fill="#22c55e"
+                                stroke="white"
+                                strokeWidth="2"
+                              />
+                              <circle
+                                cx={endX}
+                                cy={endY}
+                                r="6"
+                                fill="#f59e0b"
+                                stroke="white"
+                                strokeWidth="2"
+                              />
+                            </>
+                          );
+                        })()}
+                      </>
+                    );
+                  })()}
+                </svg>
+                <div className="absolute bottom-1 left-2 text-xs text-gray-600">
+                  🟢 Start → 🔴 Path → 🟠 Current
+                </div>
+              </div>
+            </Box>
           </div>
         </DialogContent>
 
