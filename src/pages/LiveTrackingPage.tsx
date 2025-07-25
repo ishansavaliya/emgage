@@ -8,8 +8,6 @@ import { useLocationData } from "../hooks/useLocationData";
 import useAutoRefresh from "../hooks/useAutoRefresh";
 import { Employee } from "../types/employee";
 import { Typography, Container, Grid, Paper, Box } from "@mui/material";
-import HistoryPopup from "../components/History/HistoryPopup";
-import TimelinePlayer from "../components/History/TimelinePlayer";
 
 const LiveTrackingPage: React.FC = () => {
   const { employees, loading, error, refreshData } = useLocationData();
@@ -18,12 +16,6 @@ const LiveTrackingPage: React.FC = () => {
       refreshData,
       30000 // Auto-refresh every 30 seconds
     );
-  const [selectedEmployee, setSelectedEmployee] =
-    React.useState<Employee | null>(null);
-  const [showHistoryPopup, setShowHistoryPopup] =
-    React.useState<boolean>(false);
-  const [showTimelinePlayer, setShowTimelinePlayer] =
-    React.useState<boolean>(false);
   const [focusEmployeeId, setFocusEmployeeId] = React.useState<
     string | undefined
   >(undefined);
@@ -34,16 +26,6 @@ const LiveTrackingPage: React.FC = () => {
     } else {
       startAutoRefresh();
     }
-  };
-
-  const handleViewHistory = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setShowHistoryPopup(true);
-  };
-
-  const handleViewTimeline = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setShowTimelinePlayer(true);
   };
 
   const handleEmployeeSelect = (employee: Employee) => {
@@ -97,8 +79,6 @@ const LiveTrackingPage: React.FC = () => {
                   <EmployeeCard
                     key={employee.id}
                     employee={employee}
-                    onViewHistory={handleViewHistory}
-                    onViewTimeline={handleViewTimeline}
                     onSelect={handleEmployeeSelect}
                   />
                 ))}
@@ -113,22 +93,6 @@ const LiveTrackingPage: React.FC = () => {
             </Paper>
           </Grid>
         </Grid>
-
-        {/* History popup at the page level */}
-        {selectedEmployee && (
-          <>
-            <HistoryPopup
-              open={showHistoryPopup}
-              onClose={() => setShowHistoryPopup(false)}
-              employee={selectedEmployee}
-            />
-            <TimelinePlayer
-              open={showTimelinePlayer}
-              onClose={() => setShowTimelinePlayer(false)}
-              employee={selectedEmployee}
-            />
-          </>
-        )}
       </Container>
     </Layout>
   );
