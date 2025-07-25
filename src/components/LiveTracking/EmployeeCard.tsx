@@ -7,9 +7,10 @@ import {
   Chip,
   IconButton,
 } from "@mui/material";
-import { History, LocationOn, PlayArrow, Stop } from "@mui/icons-material";
+import { History, LocationOn, GpsFixed } from "@mui/icons-material";
 import { Employee } from "../../types/employee";
 import HistoryPopup from "../History/HistoryPopup";
+import { format } from "date-fns";
 
 interface EmployeeCardProps {
   employee: Employee;
@@ -42,12 +43,20 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee }) => {
                 </Typography>
               </div>
               <div className="flex items-center justify-between mt-2">
-                <Chip
-                  icon={employee.isActive ? <PlayArrow /> : <Stop />}
-                  label={employee.isActive ? "Active" : "Inactive"}
-                  color={employee.isActive ? "success" : "default"}
-                  size="small"
-                />
+                <div className="flex flex-col space-y-1">
+                  <Chip
+                    icon={<GpsFixed />}
+                    label="Always Active"
+                    color="success"
+                    size="small"
+                  />
+                  {employee.lastFetchTime && (
+                    <Typography variant="caption" className="text-gray-500">
+                      Last update:{" "}
+                      {format(new Date(employee.lastFetchTime), "HH:mm:ss")}
+                    </Typography>
+                  )}
+                </div>
                 <IconButton
                   onClick={() => setShowHistory(true)}
                   size="small"

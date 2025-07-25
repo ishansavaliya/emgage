@@ -36,7 +36,7 @@ const TimelinePlayer: React.FC<TimelinePlayerProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const [intervalId, setIntervalId] = useState<number | null>(null);
 
   const speedOptions = [0.5, 1, 2, 5, 10, 25, 50, 100];
 
@@ -189,13 +189,75 @@ const TimelinePlayer: React.FC<TimelinePlayerProps> = ({
               </Button>
             </Box>
 
-            {/* Map Placeholder */}
-            <Box className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-              <Typography variant="body1" className="text-gray-600">
-                Map View - Location:{" "}
-                {currentRecord.location.latitude.toFixed(4)},{" "}
-                {currentRecord.location.longitude.toFixed(4)}
+            {/* Travel Path Visualization */}
+            <Box className="h-64 bg-gray-100 rounded-lg p-4">
+              <Typography variant="h6" className="mb-2">
+                Travel Path
               </Typography>
+              <div className="relative h-48 bg-white rounded border">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 400 200"
+                  className="absolute inset-0"
+                >
+                  {/* Draw path lines */}
+                  {employee.history
+                    .slice(0, currentIndex + 1)
+                    .map((record, index) => {
+                      if (index === 0) return null;
+                      const prevRecord = employee.history[index - 1];
+
+                      // Normalize coordinates to fit in the SVG viewport
+                      const x1 =
+                        ((prevRecord.location.longitude + 180) / 360) * 400;
+                      const y1 =
+                        ((90 - prevRecord.location.latitude) / 180) * 200;
+                      const x2 =
+                        ((record.location.longitude + 180) / 360) * 400;
+                      const y2 = ((90 - record.location.latitude) / 180) * 200;
+
+                      return (
+                        <line
+                          key={`line-${index}`}
+                          x1={x1}
+                          y1={y1}
+                          x2={x2}
+                          y2={y2}
+                          stroke="#ef4444"
+                          strokeWidth="2"
+                          opacity={index <= currentIndex ? 1 : 0.3}
+                        />
+                      );
+                    })}
+
+                  {/* Draw location points */}
+                  {employee.history
+                    .slice(0, currentIndex + 1)
+                    .map((record, index) => {
+                      const x = ((record.location.longitude + 180) / 360) * 400;
+                      const y = ((90 - record.location.latitude) / 180) * 200;
+
+                      return (
+                        <circle
+                          key={`point-${index}`}
+                          cx={x}
+                          cy={y}
+                          r={index === currentIndex ? 8 : 4}
+                          fill={index === currentIndex ? "#2563eb" : "#ef4444"}
+                          stroke="white"
+                          strokeWidth="2"
+                        />
+                      );
+                    })}
+                </svg>
+                <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded text-sm">
+                  Red line shows travel path
+                </div>
+                <div className="absolute bottom-2 right-2 bg-white px-2 py-1 rounded text-sm">
+                  Blue dot: Current position
+                </div>
+              </div>
             </Box>
           </Box>
         )}

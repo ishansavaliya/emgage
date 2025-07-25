@@ -11,10 +11,11 @@ import { Typography, Container, Grid, Paper, Box } from "@mui/material";
 
 const LiveTrackingPage: React.FC = () => {
   const { employees, loading, error, refreshData } = useLocationData();
-  const { startAutoRefresh, stopAutoRefresh, isActive } = useAutoRefresh(
-    refreshData,
-    5000
-  );
+  const { startAutoRefresh, stopAutoRefresh, isActive, timeLeft } =
+    useAutoRefresh(
+      refreshData,
+      30000 // Auto-refresh every 30 seconds
+    );
 
   const handleToggleAutoRefresh = () => {
     if (isActive) {
@@ -55,6 +56,7 @@ const LiveTrackingPage: React.FC = () => {
             onRefresh={refreshData}
             isAutoRefreshing={isActive}
             onToggleAutoRefresh={handleToggleAutoRefresh}
+            timeLeft={timeLeft}
           />
         </Box>
 

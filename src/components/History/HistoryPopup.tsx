@@ -14,7 +14,7 @@ import {
   Chip,
   Box,
 } from "@mui/material";
-import { LocationOn, PlayArrow, Stop, History } from "@mui/icons-material";
+import { LocationOn, PlayArrow } from "@mui/icons-material";
 import { Employee } from "../../types/employee";
 import TimelinePlayer from "./TimelinePlayer";
 import { format } from "date-fns";
@@ -49,6 +49,15 @@ const HistoryPopup: React.FC<HistoryPopupProps> = ({
               <Typography variant="body2" className="opacity-90">
                 Location History
               </Typography>
+              {employee.lastFetchTime && (
+                <Typography variant="caption" className="opacity-75">
+                  Last fetch:{" "}
+                  {format(
+                    new Date(employee.lastFetchTime),
+                    "MMM dd, yyyy HH:mm:ss"
+                  )}
+                </Typography>
+              )}
             </div>
           </div>
         </DialogTitle>
@@ -78,8 +87,6 @@ const HistoryPopup: React.FC<HistoryPopupProps> = ({
                   <ListItemIcon>
                     {record.action === "started" ? (
                       <PlayArrow className="text-green-600" />
-                    ) : record.action === "stopped" ? (
-                      <Stop className="text-red-600" />
                     ) : (
                       <LocationOn className="text-blue-600" />
                     )}
@@ -89,7 +96,6 @@ const HistoryPopup: React.FC<HistoryPopupProps> = ({
                       <div className="flex items-center justify-between">
                         <Typography variant="body1" className="font-medium">
                           {record.action === "started" && "Started tracking"}
-                          {record.action === "stopped" && "Stopped tracking"}
                           {record.action === "moved" && "Location update"}
                         </Typography>
                         <Chip
