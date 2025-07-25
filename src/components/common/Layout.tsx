@@ -3,7 +3,12 @@ import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { Dashboard } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface LayoutProps {
+  children: React.ReactNode;
+  rightComponent?: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children, rightComponent }) => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <AppBar
@@ -14,6 +19,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Live Tracking Application
           </Typography>
+
+          {/* Right component (like refresh controls) */}
+          {rightComponent && <Box className="mr-4">{rightComponent}</Box>}
+
           <Box className="space-x-2">
             <Button
               component={Link}

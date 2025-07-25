@@ -53,26 +53,18 @@ const LiveTrackingPage: React.FC = () => {
   }
 
   return (
-    <Layout>
+    <Layout
+      rightComponent={
+        <RefreshControls
+          onRefresh={refreshData}
+          isAutoRefreshing={isActive}
+          onToggleAutoRefresh={handleToggleAutoRefresh}
+          timeLeft={timeLeft}
+        />
+      }
+    >
       <Container maxWidth="xl" className="py-6">
         <Grid container spacing={3}>
-          {/* Header with Controls */}
-          <Grid item xs={12}>
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-              <Typography variant="h4" className="font-bold text-gray-800">
-                Live Employee Tracking
-              </Typography>
-              <div className="lg:w-80">
-                <RefreshControls
-                  onRefresh={refreshData}
-                  isAutoRefreshing={isActive}
-                  onToggleAutoRefresh={handleToggleAutoRefresh}
-                  timeLeft={timeLeft}
-                />
-              </div>
-            </div>
-          </Grid>
-
           {/* Employee Cards */}
           <Grid item xs={12} lg={4}>
             <Paper elevation={2} className="p-4 h-fit">

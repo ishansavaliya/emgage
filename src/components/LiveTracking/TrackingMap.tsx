@@ -57,7 +57,12 @@ const MapUpdater: React.FC<{ center: [number, number]; zoom?: number }> = ({
 }) => {
   const map = useMap();
   useEffect(() => {
-    map.setView(center, zoom);
+    // Use flyTo for smoother transitions, but with minimal duration for immediate response
+    if (zoom !== undefined) {
+      map.flyTo(center, zoom, { duration: 0.3 });
+    } else {
+      map.flyTo(center, map.getZoom(), { duration: 0.3 });
+    }
   }, [center, zoom, map]);
   return null;
 };
@@ -204,6 +209,19 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
     }
   }, [showTimeline, timelineEmployee, timelineIndex]);
 
+  // Additional effect to ensure immediate focus when timeline opens
+  useEffect(() => {
+    if (
+      showTimeline &&
+      timelineEmployee &&
+      timelineEmployee.history.length > 0
+    ) {
+      const startPos = timelineEmployee.history[0];
+      setMapCenter([startPos.location.latitude, startPos.location.longitude]);
+      setMapZoom(16);
+    }
+  }, [showTimeline, timelineEmployee]);
+
   const handleEmployeeClick = (employee: Employee) => {
     // For mini popup, we'll just focus on the employee
     setMapCenter([
@@ -219,11 +237,11 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
     setShowTimeline(true);
     setIsTimelinePlaying(false);
 
-    // Focus map on the employee's starting position
+    // Focus map on the employee's starting position immediately
     if (employee.history.length > 0) {
       const startPos = employee.history[0];
       setMapCenter([startPos.location.latitude, startPos.location.longitude]);
-      setMapZoom(15);
+      setMapZoom(16); // Increased zoom for better focus
     }
   };
 
@@ -327,41 +345,10 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
                   </p>
                   {employee.lastFetchTime && (
                     <p className="text-xs text-gray-500">
-                      Last update:{" "}
+                      Last fetch:{" "}
                       {new Date(employee.lastFetchTime).toLocaleTimeString()}
                     </p>
                   )}
-                </div>
-
-                {/* Recent Activity */}
-                <div className="mb-3">
-                  <h4 className="font-semibold text-sm text-gray-700 mb-2">
-                    Recent Activity
-                  </h4>
-                  <div className="max-h-24 overflow-y-auto space-y-1">
-                    {employee.history.slice(0, 3).map((record) => (
-                      <div
-                        key={record.id}
-                        className="text-xs bg-gray-50 p-2 rounded"
-                      >
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600">
-                            {record.action === "started"
-                              ? "🟢 Started"
-                              : "📍 Moved"}
-                          </span>
-                          <span className="text-gray-500">
-                            {new Date(record.timestamp).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        {record.speed && (
-                          <p className="text-gray-500 mt-1">
-                            Speed: {record.speed.toFixed(1)} km/h
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Action Buttons */}

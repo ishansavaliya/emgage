@@ -17,12 +17,12 @@ const RefreshControls: React.FC<{
   const progressValue = isAutoRefreshing ? ((30 - timeLeft) / 30) * 100 : 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+    <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-3 text-white">
       {/* Compact Control Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-          <Typography variant="h6" className="text-gray-800 font-medium">
+          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          <Typography variant="body2" className="text-white font-medium">
             Live Tracking
           </Typography>
         </div>
@@ -33,15 +33,18 @@ const RefreshControls: React.FC<{
               <CircularProgress
                 variant="determinate"
                 value={progressValue}
-                size={24}
+                size={20}
                 thickness={6}
-                className="text-blue-500"
+                sx={{ color: "white" }}
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Timer className="text-blue-600" sx={{ fontSize: 12 }} />
+                <Timer sx={{ fontSize: 10, color: "white" }} />
               </div>
             </div>
-            <Typography variant="caption" className="text-blue-600 font-medium">
+            <Typography
+              variant="caption"
+              className="text-white font-medium text-xs"
+            >
               {formatTime(timeLeft)}
             </Typography>
           </div>
@@ -54,8 +57,17 @@ const RefreshControls: React.FC<{
           onClick={onRefresh}
           variant="outlined"
           size="small"
-          startIcon={<Refresh sx={{ fontSize: 16 }} />}
-          className="flex-1 border-blue-500 text-blue-500 hover:bg-blue-50 text-xs"
+          startIcon={<Refresh sx={{ fontSize: 14 }} />}
+          sx={{
+            borderColor: "white",
+            color: "white",
+            fontSize: "0.7rem",
+            "&:hover": {
+              borderColor: "white",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+            },
+          }}
+          className="flex-1"
         >
           Refresh
         </Button>
@@ -66,16 +78,31 @@ const RefreshControls: React.FC<{
           size="small"
           startIcon={
             isAutoRefreshing ? (
-              <Pause sx={{ fontSize: 16 }} />
+              <Pause sx={{ fontSize: 14 }} />
             ) : (
-              <PlayArrow sx={{ fontSize: 16 }} />
+              <PlayArrow sx={{ fontSize: 14 }} />
             )
           }
-          className={`flex-1 text-xs ${
-            isAutoRefreshing
-              ? "bg-red-500 hover:bg-red-600 text-white"
-              : "border-green-500 text-green-500 hover:bg-green-50"
-          }`}
+          sx={{
+            fontSize: "0.7rem",
+            ...(isAutoRefreshing
+              ? {
+                  backgroundColor: "#ef4444",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#dc2626",
+                  },
+                }
+              : {
+                  borderColor: "#22c55e",
+                  color: "#22c55e",
+                  "&:hover": {
+                    borderColor: "#22c55e",
+                    backgroundColor: "rgba(34, 197, 94, 0.1)",
+                  },
+                }),
+          }}
+          className="flex-1"
         >
           {isAutoRefreshing ? "Pause" : "Auto"}
         </Button>
