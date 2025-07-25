@@ -218,6 +218,13 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
     setTimelineIndex(0);
     setShowTimeline(true);
     setIsTimelinePlaying(false);
+
+    // Focus map on the employee's starting position
+    if (employee.history.length > 0) {
+      const startPos = employee.history[0];
+      setMapCenter([startPos.location.latitude, startPos.location.longitude]);
+      setMapZoom(15);
+    }
   };
 
   const handlePlayPause = () => {
@@ -229,6 +236,17 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
     setTimelineEmployee(null);
     setIsTimelinePlaying(false);
     setTimelineIndex(0);
+    // Reset map view to show all employees
+    if (employees.length > 0) {
+      const averageLat =
+        employees.reduce((sum, emp) => sum + emp.currentLocation.latitude, 0) /
+        employees.length;
+      const averageLng =
+        employees.reduce((sum, emp) => sum + emp.currentLocation.longitude, 0) /
+        employees.length;
+      setMapCenter([averageLat, averageLng]);
+      setMapZoom(13);
+    }
   };
 
   return (
@@ -353,9 +371,9 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
                       e.preventDefault();
                       handleStartTimeline(employee);
                     }}
-                    className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600 transition-colors"
+                    className="flex-1 bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 transition-colors"
                   >
-                    📊 Play Timeline
+                    � Show History Path
                   </button>
                 </div>
               </div>
@@ -363,7 +381,7 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
           </Marker>
         ))}
 
-        {/* Timeline marker - shows current position during timeline playback */}
+        {/* Timeline marker - mini avatar traversing the red line path */}
         {showTimeline &&
           timelineEmployee &&
           timelineEmployee.history[timelineIndex] && (
@@ -375,13 +393,13 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
               icon={L.divIcon({
                 html: `
                 <div style="
-                  width: 50px; 
-                  height: 50px; 
+                  width: 32px; 
+                  height: 32px; 
                   border-radius: 50%; 
                   overflow: hidden; 
-                  border: 4px solid #2563eb; 
+                  border: 3px solid #ef4444; 
                   background: white;
-                  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+                  box-shadow: 0 3px 10px rgba(239, 68, 68, 0.6);
                   position: relative;
                 ">
                   <img 
@@ -395,44 +413,47 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
                   />
                   <div style="
                     position: absolute;
-                    bottom: -2px;
-                    right: -2px;
-                    width: 16px;
-                    height: 16px;
-                    background: #2563eb;
+                    bottom: -1px;
+                    right: -1px;
+                    width: 12px;
+                    height: 12px;
+                    background: #ef4444;
                     border-radius: 50%;
                     border: 2px solid white;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 8px;
+                    font-size: 6px;
                     color: white;
+                    font-weight: bold;
                   ">
-                    ▶
+                    ${isTimelinePlaying ? "▶" : "⏸"}
                   </div>
                 </div>
               `,
-                className: "timeline-marker",
-                iconSize: [50, 50],
-                iconAnchor: [25, 25],
-                popupAnchor: [0, -25],
+                className: "timeline-marker-mini",
+                iconSize: [32, 32],
+                iconAnchor: [16, 16],
+                popupAnchor: [0, -16],
               })}
               zIndexOffset={2000}
             >
-              <Popup>
-                <div className="text-center">
-                  <h4 className="font-bold text-blue-600">Timeline Position</h4>
-                  <p className="text-sm text-gray-600">
+              <Tooltip>
+                <div className="text-center text-xs">
+                  <div className="font-bold text-red-600">
+                    {timelineEmployee.name}
+                  </div>
+                  <div className="text-gray-600">
                     {new Date(
                       timelineEmployee.history[timelineIndex].timestamp
-                    ).toLocaleString()}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                    ).toLocaleTimeString()}
+                  </div>
+                  <div className="text-gray-500">
                     Step {timelineIndex + 1} of{" "}
                     {timelineEmployee.history.length}
-                  </p>
+                  </div>
                 </div>
-              </Popup>
+              </Tooltip>
             </Marker>
           )}
       </MapContainer>
@@ -443,42 +464,42 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
         🔄 Refresh
       </button>
 
-      {/* Timeline Controls Overlay */}
+      {/* Compact Timeline Controls for Red Line Traversal */}
       {showTimeline && timelineEmployee && (
-        <div className="absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 z-[1000] border border-gray-200">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-3">
+        <div className="absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-3 z-[1000] border-2 border-red-200">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2">
               <img
                 src={timelineEmployee.image}
                 alt={timelineEmployee.name}
-                className="w-10 h-10 rounded-full border-2 border-blue-500"
+                className="w-8 h-8 rounded-full border-2 border-red-500"
               />
               <div>
-                <h3 className="font-bold text-gray-800">
+                <h3 className="font-bold text-gray-800 text-sm">
                   {timelineEmployee.name}
                 </h3>
-                <p className="text-sm text-gray-600">Timeline Player</p>
+                <p className="text-xs text-gray-600">History Traversal</p>
               </div>
             </div>
             <button
               onClick={handleTimelineClose}
-              className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+              className="text-gray-500 hover:text-gray-700 text-lg font-bold w-6 h-6 flex items-center justify-center"
             >
               ×
             </button>
           </div>
 
-          {/* Timeline Progress */}
-          <div className="mb-3">
+          {/* Compact Progress Info */}
+          <div className="mb-2">
             <div className="flex justify-between text-xs text-gray-600 mb-1">
               <span>
                 Step {timelineIndex + 1} of {timelineEmployee.history.length}
               </span>
               <span>Speed: {playbackSpeed}x</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-200 rounded-full h-1.5">
               <div
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                className="bg-red-500 h-1.5 rounded-full transition-all duration-300"
                 style={{
                   width: `${
                     ((timelineIndex + 1) / timelineEmployee.history.length) *
@@ -487,55 +508,34 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
                 }}
               ></div>
             </div>
-            <input
-              type="range"
-              min={0}
-              max={timelineEmployee.history.length - 1}
-              value={timelineIndex}
-              onChange={(e) => setTimelineIndex(parseInt(e.target.value))}
-              className="w-full mt-2"
-            />
           </div>
 
-          {/* Current Timeline Info */}
+          {/* Current Position Info */}
           {timelineEmployee.history[timelineIndex] && (
-            <div className="mb-3 p-2 bg-gray-50 rounded text-sm">
+            <div className="mb-2 p-2 bg-red-50 rounded text-xs">
               <p className="font-medium text-gray-800">
                 {new Date(
                   timelineEmployee.history[timelineIndex].timestamp
-                ).toLocaleString()}
+                ).toLocaleTimeString()}
               </p>
-              <p className="text-gray-600">
-                📍{" "}
-                {timelineEmployee.history[timelineIndex].location.address ||
-                  `${timelineEmployee.history[
-                    timelineIndex
-                  ].location.latitude.toFixed(4)}, ${timelineEmployee.history[
-                    timelineIndex
-                  ].location.longitude.toFixed(4)}`}
+              <p className="text-gray-600 truncate">
+                📍 {timelineEmployee.history[timelineIndex].location.address}
               </p>
-              {timelineEmployee.history[timelineIndex].speed && (
-                <p className="text-gray-600">
-                  🚗 Speed:{" "}
-                  {timelineEmployee.history[timelineIndex].speed.toFixed(1)}{" "}
-                  km/h
-                </p>
-              )}
             </div>
           )}
 
-          {/* Control Buttons */}
-          <div className="flex items-center justify-center space-x-3">
+          {/* Compact Control Buttons */}
+          <div className="flex items-center justify-center space-x-2">
             <button
               onClick={() => setTimelineIndex(Math.max(0, timelineIndex - 1))}
               disabled={timelineIndex === 0}
-              className="px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ⏮
             </button>
             <button
               onClick={handlePlayPause}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
             >
               {isTimelinePlaying ? "⏸️" : "▶️"}
             </button>
@@ -549,14 +549,14 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
                 )
               }
               disabled={timelineIndex === timelineEmployee.history.length - 1}
-              className="px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ⏭
             </button>
             <select
               value={playbackSpeed}
               onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-              className="px-2 py-1 border border-gray-300 rounded text-sm"
+              className="px-2 py-1 border border-gray-300 rounded text-xs"
             >
               <option value={0.5}>0.5x</option>
               <option value={1}>1x</option>
@@ -564,115 +564,6 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
               <option value={5}>5x</option>
               <option value={10}>10x</option>
             </select>
-          </div>
-
-          {/* Timeline Visualization */}
-          <div className="mt-4 p-3 bg-gray-50 rounded">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">
-              Travel Path
-            </h4>
-            <div className="relative h-20 bg-white rounded border overflow-hidden">
-              <svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 400 80"
-                className="absolute inset-0"
-              >
-                {(() => {
-                  if (timelineEmployee.history.length < 2) return null;
-
-                  const lats = timelineEmployee.history.map(
-                    (h) => h.location.latitude
-                  );
-                  const lngs = timelineEmployee.history.map(
-                    (h) => h.location.longitude
-                  );
-                  const minLat = Math.min(...lats);
-                  const maxLat = Math.max(...lats);
-                  const minLng = Math.min(...lngs);
-                  const maxLng = Math.max(...lngs);
-                  const latRange = maxLat - minLat || 0.01;
-                  const lngRange = maxLng - minLng || 0.01;
-
-                  return (
-                    <>
-                      {/* Draw path lines */}
-                      {timelineEmployee.history.map((record, index) => {
-                        if (index === 0) return null;
-                        const prevRecord = timelineEmployee.history[index - 1];
-                        const x1 =
-                          ((prevRecord.location.longitude - minLng) /
-                            lngRange) *
-                            360 +
-                          20;
-                        const y1 =
-                          ((maxLat - prevRecord.location.latitude) / latRange) *
-                            40 +
-                          20;
-                        const x2 =
-                          ((record.location.longitude - minLng) / lngRange) *
-                            360 +
-                          20;
-                        const y2 =
-                          ((maxLat - record.location.latitude) / latRange) *
-                            40 +
-                          20;
-
-                        return (
-                          <line
-                            key={`line-${index}`}
-                            x1={x1}
-                            y1={y1}
-                            x2={x2}
-                            y2={y2}
-                            stroke={
-                              index <= timelineIndex ? "#ef4444" : "#d1d5db"
-                            }
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                        );
-                      })}
-
-                      {/* Draw position points */}
-                      {timelineEmployee.history.map((record, index) => {
-                        const x =
-                          ((record.location.longitude - minLng) / lngRange) *
-                            360 +
-                          20;
-                        const y =
-                          ((maxLat - record.location.latitude) / latRange) *
-                            40 +
-                          20;
-
-                        return (
-                          <circle
-                            key={`point-${index}`}
-                            cx={x}
-                            cy={y}
-                            r={index === timelineIndex ? 6 : 3}
-                            fill={
-                              index === timelineIndex
-                                ? "#2563eb"
-                                : index === 0
-                                ? "#22c55e"
-                                : index === timelineEmployee.history.length - 1
-                                ? "#f59e0b"
-                                : "#ef4444"
-                            }
-                            stroke="white"
-                            strokeWidth="1"
-                          />
-                        );
-                      })}
-                    </>
-                  );
-                })()}
-              </svg>
-              <div className="absolute bottom-1 left-2 text-xs text-gray-600">
-                🟢 Start → 🔴 Path → 🔵 Current → 🟠 End
-              </div>
-            </div>
           </div>
         </div>
       )}

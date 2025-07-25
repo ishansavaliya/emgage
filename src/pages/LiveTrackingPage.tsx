@@ -14,7 +14,7 @@ const LiveTrackingPage: React.FC = () => {
   const { startAutoRefresh, stopAutoRefresh, isActive, timeLeft } =
     useAutoRefresh(
       refreshData,
-      30000 // Auto-refresh every 30 seconds
+      30000 // Auto-refresh every 30 seconds to match the mock data updates
     );
   const [focusEmployeeId, setFocusEmployeeId] = React.useState<
     string | undefined
