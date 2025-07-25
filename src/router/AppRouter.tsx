@@ -1,15 +1,10 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import LiveTrackingPage from '../pages/LiveTrackingPage';
-import HistoryPage from '../pages/HistoryPage';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import LiveTrackingPage from "../pages/LiveTrackingPage";
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <LiveTrackingPage />,
-  },
-  {
-    path: '/history',
-    element: <HistoryPage />,
   },
 ]);
 

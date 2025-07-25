@@ -6,24 +6,29 @@ import {
   Typography,
   Chip,
   IconButton,
+  Button,
 } from "@mui/material";
-import { History, LocationOn, GpsFixed } from "@mui/icons-material";
+import { History, LocationOn, GpsFixed, Timeline } from "@mui/icons-material";
 import { Employee } from "../../types/employee";
 import HistoryPopup from "../History/HistoryPopup";
+import TimelinePlayer from "../History/TimelinePlayer";
 import { format } from "date-fns";
 
 interface EmployeeCardProps {
   employee: Employee;
   onViewHistory?: (employee: Employee) => void;
+  onViewTimeline?: (employee: Employee) => void;
   onSelect?: (employee: Employee) => void;
 }
 
 const EmployeeCard: React.FC<EmployeeCardProps> = ({
   employee,
   onViewHistory,
+  onViewTimeline,
   onSelect,
 }) => {
   const [showHistory, setShowHistory] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   const handleHistoryClick = (e: React.MouseEvent) => {
@@ -34,6 +39,17 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({
       onViewHistory(employee);
     } else {
       setShowHistory(true);
+    }
+  };
+
+  const handleTimelineClick = (e: React.MouseEvent) => {
+    // Prevent the card click from triggering
+    e.stopPropagation();
+
+    if (onViewTimeline) {
+      onViewTimeline(employee);
+    } else {
+      setShowTimeline(true);
     }
   };
 
@@ -90,13 +106,24 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({
                     </Typography>
                   )}
                 </div>
-                <IconButton
-                  onClick={(e) => handleHistoryClick(e)}
-                  size="small"
-                  className="text-blue-600"
-                >
-                  <History />
-                </IconButton>
+                <div className="flex space-x-1">
+                  <IconButton
+                    onClick={(e) => handleHistoryClick(e)}
+                    size="small"
+                    className="text-blue-600"
+                    title="View History"
+                  >
+                    <History />
+                  </IconButton>
+                  <IconButton
+                    onClick={(e) => handleTimelineClick(e)}
+                    size="small"
+                    className="text-purple-600"
+                    title="Play Timeline"
+                  >
+                    <Timeline />
+                  </IconButton>
+                </div>
               </div>
             </div>
           </div>
@@ -104,11 +131,18 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({
       </Card>
 
       {!onViewHistory && (
-        <HistoryPopup
-          open={showHistory}
-          onClose={() => setShowHistory(false)}
-          employee={employee}
-        />
+        <>
+          <HistoryPopup
+            open={showHistory}
+            onClose={() => setShowHistory(false)}
+            employee={employee}
+          />
+          <TimelinePlayer
+            open={showTimeline}
+            onClose={() => setShowTimeline(false)}
+            employee={employee}
+          />
+        </>
       )}
     </>
   );

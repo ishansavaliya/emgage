@@ -1,18 +1,9 @@
 import React from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Container,
-  Button,
-  Box,
-} from "@mui/material";
-import { Dashboard, History } from "@mui/icons-material";
-import { Link, useLocation } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import { Dashboard } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const location = useLocation();
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <AppBar
@@ -29,18 +20,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               to="/"
               color="inherit"
               startIcon={<Dashboard />}
-              variant={location.pathname === "/" ? "outlined" : "text"}
+              variant="outlined"
             >
               Live Tracking
-            </Button>
-            <Button
-              component={Link}
-              to="/history"
-              color="inherit"
-              startIcon={<History />}
-              variant={location.pathname === "/history" ? "outlined" : "text"}
-            >
-              History
             </Button>
           </Box>
         </Toolbar>
