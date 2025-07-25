@@ -7,7 +7,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import { useLocationData } from "../hooks/useLocationData";
 import useAutoRefresh from "../hooks/useAutoRefresh";
 import { Employee } from "../types/employee";
-import { Typography, Container, Grid, Paper, Box } from "@mui/material";
+import { Typography, Container, Grid, Paper } from "@mui/material";
 
 const LiveTrackingPage: React.FC = () => {
   const { employees, loading, error, refreshData } = useLocationData();
@@ -55,19 +55,24 @@ const LiveTrackingPage: React.FC = () => {
   return (
     <Layout>
       <Container maxWidth="xl" className="py-6">
-        <Box className="mb-6">
-          <Typography variant="h4" className="font-bold mb-4 text-gray-800">
-            Live Employee Tracking
-          </Typography>
-          <RefreshControls
-            onRefresh={refreshData}
-            isAutoRefreshing={isActive}
-            onToggleAutoRefresh={handleToggleAutoRefresh}
-            timeLeft={timeLeft}
-          />
-        </Box>
-
         <Grid container spacing={3}>
+          {/* Header with Controls */}
+          <Grid item xs={12}>
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+              <Typography variant="h4" className="font-bold text-gray-800">
+                Live Employee Tracking
+              </Typography>
+              <div className="lg:w-80">
+                <RefreshControls
+                  onRefresh={refreshData}
+                  isAutoRefreshing={isActive}
+                  onToggleAutoRefresh={handleToggleAutoRefresh}
+                  timeLeft={timeLeft}
+                />
+              </div>
+            </div>
+          </Grid>
+
           {/* Employee Cards */}
           <Grid item xs={12} lg={4}>
             <Paper elevation={2} className="p-4 h-fit">
