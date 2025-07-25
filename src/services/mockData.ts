@@ -30,7 +30,7 @@ export const mockEmployees: Employee[] = [
   {
     id: "1",
     name: "John Doe",
-    image: "/employee-avatars/john-doe.jpg",
+    image: "https://i.pravatar.cc/150?img=1",
     currentLocation: {
       latitude: 37.7749,
       longitude: -122.4194,
@@ -46,7 +46,7 @@ export const mockEmployees: Employee[] = [
   {
     id: "2",
     name: "Jane Smith",
-    image: "/employee-avatars/jane-smith.jpg",
+    image: "https://i.pravatar.cc/150?img=2",
     currentLocation: {
       latitude: 34.0522,
       longitude: -118.2437,
@@ -62,7 +62,7 @@ export const mockEmployees: Employee[] = [
   {
     id: "3",
     name: "Alice Johnson",
-    image: "/employee-avatars/alice-johnson.jpg",
+    image: "https://i.pravatar.cc/150?img=3",
     currentLocation: {
       latitude: 40.7128,
       longitude: -74.006,

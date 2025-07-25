@@ -1,40 +1,88 @@
-import React, { useEffect, useState } from 'react';
-import EmployeeCard from '../components/LiveTracking/EmployeeCard';
-import TrackingMap from '../components/LiveTracking/TrackingMap';
-import RefreshControls from '../components/LiveTracking/RefreshControls';
-import { useLocationData } from '../hooks/useLocationData';
-import { Employee } from '../types/employee';
+import React from "react";
+import EmployeeCard from "../components/LiveTracking/EmployeeCard";
+import TrackingMap from "../components/LiveTracking/TrackingMap";
+import RefreshControls from "../components/LiveTracking/RefreshControls";
+import Layout from "../components/common/Layout";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import { useLocationData } from "../hooks/useLocationData";
+import useAutoRefresh from "../hooks/useAutoRefresh";
+import { Employee } from "../types/employee";
+import { Typography, Container, Grid, Paper, Box } from "@mui/material";
 
 const LiveTrackingPage: React.FC = () => {
-    const { employees, refreshData } = useLocationData();
-    const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
+  const { employees, loading, error, refreshData } = useLocationData();
+  const { startAutoRefresh, stopAutoRefresh, isActive } = useAutoRefresh(
+    refreshData,
+    5000
+  );
 
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
+  const handleToggleAutoRefresh = () => {
+    if (isActive) {
+      stopAutoRefresh();
+    } else {
+      startAutoRefresh();
+    }
+  };
 
-        if (autoRefresh) {
-            interval = setInterval(() => {
-                refreshData();
-            }, 5000); // Refresh every 5 seconds
-        }
-
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [autoRefresh, refreshData]);
-
+  if (loading) {
     return (
-        <div className="flex flex-col items-center">
-            <h1 className="text-2xl font-bold mb-4">Live Employee Tracking</h1>
-            <RefreshControls setAutoRefresh={setAutoRefresh} />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-                {employees.map((employee: Employee) => (
-                    <EmployeeCard key={employee.id} employee={employee} />
-                ))}
-            </div>
-            <TrackingMap employees={employees} />
+      <Layout>
+        <div className="flex justify-center items-center h-64">
+          <LoadingSpinner />
         </div>
+      </Layout>
     );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="text-center text-red-600 p-4">
+          <Typography variant="h6">Error: {error}</Typography>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <Container maxWidth="xl" className="py-6">
+        <Box className="mb-6">
+          <Typography variant="h4" className="font-bold mb-4 text-gray-800">
+            Live Employee Tracking
+          </Typography>
+          <RefreshControls
+            onRefresh={refreshData}
+            isAutoRefreshing={isActive}
+            onToggleAutoRefresh={handleToggleAutoRefresh}
+          />
+        </Box>
+
+        <Grid container spacing={3}>
+          {/* Employee Cards */}
+          <Grid item xs={12} lg={4}>
+            <Paper elevation={2} className="p-4 h-fit">
+              <Typography variant="h6" className="mb-4 font-semibold">
+                Employees ({employees.length})
+              </Typography>
+              <div className="space-y-4">
+                {employees.map((employee: Employee) => (
+                  <EmployeeCard key={employee.id} employee={employee} />
+                ))}
+              </div>
+            </Paper>
+          </Grid>
+
+          {/* Map */}
+          <Grid item xs={12} lg={8}>
+            <Paper elevation={2} className="h-96 lg:h-[600px]">
+              <TrackingMap />
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    </Layout>
+  );
 };
 
 export default LiveTrackingPage;
