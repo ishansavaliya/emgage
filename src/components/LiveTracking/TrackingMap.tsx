@@ -250,21 +250,24 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
   };
 
   const handleTimelineClose = () => {
+    // Store the current timeline employee before clearing it
+    const currentTimelineEmployee = timelineEmployee;
+
     setShowTimeline(false);
-    setTimelineEmployee(null);
     setIsTimelinePlaying(false);
     setTimelineIndex(0);
-    // Reset map view to show all employees
-    if (employees.length > 0) {
-      const averageLat =
-        employees.reduce((sum, emp) => sum + emp.currentLocation.latitude, 0) /
-        employees.length;
-      const averageLng =
-        employees.reduce((sum, emp) => sum + emp.currentLocation.longitude, 0) /
-        employees.length;
-      setMapCenter([averageLat, averageLng]);
-      setMapZoom(13);
+
+    // Focus on the employee's current live location when closing timeline
+    if (currentTimelineEmployee) {
+      setMapCenter([
+        currentTimelineEmployee.currentLocation.latitude,
+        currentTimelineEmployee.currentLocation.longitude,
+      ]);
+      setMapZoom(16); // Keep zoomed in on the employee
     }
+
+    // Clear timeline employee after using it
+    setTimelineEmployee(null);
   };
 
   return (
@@ -550,6 +553,8 @@ const TrackingMap: React.FC<TrackingMapProps> = ({ focusEmployeeId }) => {
               <option value={2}>2x</option>
               <option value={5}>5x</option>
               <option value={10}>10x</option>
+              <option value={50}>50x</option>
+              <option value={100}>100x</option>
             </select>
           </div>
         </div>

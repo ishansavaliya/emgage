@@ -52,12 +52,12 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onSelect }) => {
               </div>
               <div className="flex items-center justify-between mt-2">
                 <div className="flex flex-col space-y-1">
-                  <Chip
+                  {/* <Chip
                     icon={<GpsFixed />}
                     label="Always Active"
                     color="success"
                     size="small"
-                  />
+                  /> */}
                   {employee.lastFetchTime && (
                     <Typography variant="caption" className="text-gray-500">
                       Last update:{" "}
@@ -65,11 +65,11 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onSelect }) => {
                     </Typography>
                   )}
                 </div>
-                <div className="text-sm text-gray-600 mt-2">
+                {/* <div className="text-sm text-gray-600 mt-2">
                   <Typography variant="body2">
                     📍 Click on map marker for details and timeline
                   </Typography>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

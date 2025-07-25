@@ -32,6 +32,10 @@ const LiveTrackingPage: React.FC = () => {
     setFocusEmployeeId(employee.id);
   };
 
+  const handleEmployeeFocus = (employeeId: string) => {
+    setFocusEmployeeId(employeeId);
+  };
+
   if (loading) {
     return (
       <Layout>
